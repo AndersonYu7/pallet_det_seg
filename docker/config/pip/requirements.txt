@@ -1,8 +1,10 @@
 # install python dep
 
-setuptools==67.8.0
-numpy==1.23
-
+#setuptools==67.8.0
+setuptools==58.1
+#numpy==1.23
+numpy==1.16
+mmcv-full==1.7.1
 
 # serial==0.0.97
 pyserial==3.5

@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.1.1-cudnn8-devel-ubuntu20.04
+FROM nvcr.io/nvidia/l4t-ml:r35.1.0-py3
 
 ############################## SYSTEM PARAMETERS ##############################
 # * Arguments
@@ -70,50 +70,32 @@ RUN apt install -y --no-install-recommends \
         python3-pyqt5 \
         # * ROS depend tools
         lsb-release \
+        # * solo depend tools
+        python3-tk \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ./config/pip/pip_setup.sh
-
-# * Install Pytorch, MMCV
-# [!!!] https://zhuanlan.zhihu.com/p/408209150
-# 安裝順序: python – pytorch – mmcv -mmdet 
-
-#pytorch：https://pytorch.org/get-started/previous-versions
-#mmcv：https://mmcv.readthedocs.io/en/latest/get_started/installation.html 
-
-RUN pip3 install --upgrade --force-reinstall pip && \
-    pip3 install \
-    torch==1.10.1+cu111 \
-    torchvision==0.11.2+cu111 \
-    torchaudio==0.10.1 \
-    -f https://download.pytorch.org/whl/cu111/torch_stable.html
-    # pip3 install mmcv==2.0.0rc4 -f https://download.openmmlab.com/mmcv/dist/cu111/torch1.10/index.html
 
 # SOLO depend tools
 RUN pip3 install \
     terminaltables \
     pycocotools \
     shapely \
-    scipy \
-    -U openmim 
-RUN python3 -m mim install mmcv-full==1.7.1
-RUN python3 -m mim install mmengine
+    scipy 
+RUN pip3 install -U openmim --ignore-installed
+RUN pip3 install mmengine
 RUN pip3 install yapf==0.40.1
 
-
-# * Install ROS noetic
-RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > \
-    /etc/apt/sources.list.d/ros-latest.list \
-    && apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' \
-    --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654 \
-    && curl -sSL \
-    'http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xC1CF6E31E6BADE8868B172B4F42ED6FBAB17C654' \
-    | sudo apt-key add - \
-    && apt update && apt install -y --no-install-recommends ros-noetic-desktop-full \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
+# ENV ROS_DISTRO noetic
+RUN apt-get purge -y '*opencv*'
+RUN echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list 
+RUN sudo apt install curl
+RUN curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
+RUN apt-get update 
+RUN apt-get install -y ros-noetic-desktop-full 
+RUN apt-get clean 
+RUN rm -rf /var/lib/apt/lists
 ENV ROS_DISTRO noetic
 RUN echo "source /opt/ros/$ROS_DISTRO/setup.bash" >>/home/$USER/.bashrc
 
@@ -176,12 +158,7 @@ RUN ./config/shell/bash_setup.sh "${USER}" "${GROUP}" \
 # * Switch workspace to ~/work
 RUN sudo mkdir -p /home/"${USER}"/work
 WORKDIR /home/"${USER}"/work
-
-# RUN sudo git clone https://github.com/open-mmlab/mmdetection.git -b 2.x /home/"${USER}"/work/src/mmdetection2
-# WORKDIR /mmdetection2
-# ENV FORCE_CUDA="1"
-# RUN pip3 install --no-cache-dir -r /requirements/build.txt
-# RUN pip3 install --no-cache-dir -e .
+# RUN echo  >>/home/"${USER}"/.bashrc
 
 # * Make SSH available
 EXPOSE 22

@@ -18,7 +18,7 @@
 import cv2
 import sys
 sys.path.insert(1, '/opt/installer/open_cv/cv_bridge/lib/python3/dist-packages/')
-sys.path.append('/home/iclab/work/src/mmdetection2/')
+sys.path.append('/home/orin/work/src/mmdetection2/')
 from cv_bridge import CvBridge, CvBridgeError
 
 from mmdet.apis import init_detector, inference_detector, show_result_pyplot
@@ -37,10 +37,10 @@ show_result = True
 show_mask = True
 save_result = False
 
-ws_path = '/home/iclab/work/src' #'/home/robotarm/forklift_pallet_ws/src'
+ws_path = '/home/orin/work/src' #'/home/robotarm/forklift_pallet_ws/src'
 test_img_path = ws_path + '/solo_detect/test_img/altek_img_1.jpg'
 
-checkpoint_file = ws_path + '/mmdetection2/solov2_model/pallet.pth' #SOLO/configs/solov2/***.py
+checkpoint_file = ws_path + '/mmdetection2/work_dirs/pallet.pth' #SOLO/configs/solov2/***.py
 config_file = ws_path + '/mmdetection2/configs/solov2/pallet_test_2.py'                      #SOLO/data/***.pth
 #=====Parameters Setting=====#
 
@@ -72,7 +72,7 @@ class SOLO_Det:
         solo_result = self.model.show_result(
             cv_image,
             result,
-            score_thr=0.25)
+            score_thr=0.5)
         cv2.imshow("SOLOv2 Instance Segmentation Result", solo_result)
         cv2.waitKey(1)
 
