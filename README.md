@@ -6,14 +6,19 @@ config: ./mmdetection2/configs/solov2/pallet_test_2.py
 
 weights: pallet.pth
 
-1. cd docker && ./build
-2. cd mmdetection2
-3. pip3 install -v -e .
-4. cd ../..
-5. catkin_make
-6. . devel/setup.bash
+# Orin
+1. git clone https://github.com/AndersonYu7/pallet_det_seg.git
+2. cd docker && ./build.sh
+3. cd mmdetection2
+4. pip3 install -v -e .
+5. cd ../darknet_new
+6. make
+7. cd ../..
+8. catkin_make
+9. . devel/setup.bash
 
 ## 執行seg realtime
-roslaunce realsense2_camera rs_camera.launch
+roslaunch pallet_seg pallet_seg_altek_cam.launch
 
-rosrun pallet_seg solo_detect.py
+## 執行seg&pose realtime
+roslaunch pallet_seg_pose solo_pallet_cam.launch
